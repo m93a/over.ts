@@ -1,0 +1,8 @@
+{
+  "name": "over.ts",
+  "version": "0.0.0",
+  "description": "Light, performant and convenient function overloading for TypeScript",
+  "main": "index.js",
+  "author": "m93a",
+  "license": "MIT"
+}

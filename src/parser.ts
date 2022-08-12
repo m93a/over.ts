@@ -1,5 +1,5 @@
 
-const isWhitespace = (ch: string) => /\w/.test(ch);
+const isWhitespace = (ch: string) => /\s/.test(ch);
 const isLetter = (ch: string) => /\p{Letter}/u.test(ch);
 const isComma = (ch: string) => ch === ',';
 const isArrow = (c1: string, c2: string) => c1 === '-' && c2 === '>';
@@ -73,7 +73,7 @@ export function signatureToArgumentGuard(
 export function signatureToReturnGuard(
     typeGuards: Record<string, (x: unknown) => boolean>,
     signature: string
-): (args: unknown[]) => boolean {
+): (args: unknown) => boolean {
     let pos = signature.indexOf('->');
     if (pos === -1) throw new SyntaxError('Unexpected end of string, missing return type.');
     pos += 2; // skip to the end of the arrow

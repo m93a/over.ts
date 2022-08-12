@@ -6,7 +6,8 @@ const isArrow = (c1: string, c2: string) => c1 === '-' && c2 === '>';
 
 export function signatureToArgumentGuard(
     typeGuards: Record<string, (x: unknown) => boolean>,
-    signature: string
+    signature: string,
+    acceptSuperfluousArguments: boolean = false,
 ): (args: unknown[]) => boolean {
     const guards: Array<(x: any) => boolean> = [];
 
@@ -34,7 +35,7 @@ export function signatureToArgumentGuard(
             
             case ParserState.Word:
                 const wordStart = pos;
-                while (isLetter(signature[pos])) pos++;
+                while (isLetter(signature[pos]) && pos < signature.length) pos++;
                 const word = signature.substring(wordStart, pos);
                 const guard = typeGuards[word];
                 if (guard === undefined) throw new TypeError(`Unknown type at position ${pos}:  ${word}`);
@@ -49,7 +50,7 @@ export function signatureToArgumentGuard(
                     state = ParserState.BeforeWord;
                 }
                 else if (isArrow(ch, ch2)) state = ParserState.Done;
-                else if (isLetter(ch)) throw new SyntaxError(`Unexpected identifier at positoin ${pos}.`);
+                else if (isLetter(ch)) throw new SyntaxError(`Unexpected identifier at positon ${pos}.`);
                 else throw new SyntaxError(`Unexpected character at position ${pos}: ${ch}`);
                 break;
             
@@ -67,7 +68,9 @@ export function signatureToArgumentGuard(
     }
     if (state !== ParserState.Done) throw new SyntaxError(`Unexpected end of string, missing return type.`);
 
-    return (args: unknown[]) => args.every((v, i) => guards[i](v));
+    return acceptSuperfluousArguments
+        ? (args: unknown[]) => guards.every((g, i) => g(args[i]))
+        : (args: unknown[]) => args.length <= guards.length && guards.every((g, i) => g(args[i]));
 }
 
 export function signatureToReturnGuard(

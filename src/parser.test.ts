@@ -27,6 +27,36 @@ describe("argument guard", () => {
     expect(multi([3.1, "a", "-2"])).toBe(false);
     expect(multi(["3.1", "a", -2])).toBe(false);
     expect(multi([Infinity, "xD", NaN])).toBe(true);
+
+    const none = signatureToArgumentGuard(types, "-> number");
+    expect(none([])).toBe(true);
+    expect(none([42])).toBe(false);
+  });
+
+  it("superfluous args", () => {
+    const forbid = signatureToArgumentGuard(types, "number, string -> void", false);
+    expect(forbid([4])).toBe(false);
+    expect(forbid([4, 'a'])).toBe(true);
+    expect(forbid([4, 'a', 'b'])).toBe(false);
+    
+
+    const allow = signatureToArgumentGuard(types, "number, string -> void", true);
+    expect(allow([4])).toBe(false);
+    expect(allow([4, 'a'])).toBe(true);
+    expect(allow([4, 'a', 'b'])).toBe(true);
+    expect(allow([4, 'a', {}])).toBe(true);
+  });
+
+  it("errors", () => {
+    expect(() => signatureToArgumentGuard(types, ", number -> void")).toThrow("Unexpected comma");
+    expect(() => signatureToArgumentGuard(types, "string,, number -> void")).toThrow("Duplicit comma");
+    expect(() => signatureToArgumentGuard(types, "string, -> void")).toThrow("Unexpected trailing comma");
+    expect(() => signatureToArgumentGuard(types, "%number -> void")).toThrow("Unexpected character");
+    expect(() => signatureToArgumentGuard(types, "number% -> void")).toThrow("Unexpected character");
+    expect(() => signatureToArgumentGuard(types, "number, % -> void")).toThrow("Unexpected character");
+    expect(() => signatureToArgumentGuard(types, "boolean -> void")).toThrow("Unknown type");
+    expect(() => signatureToArgumentGuard(types, "number number -> void")).toThrow("Unexpected identifier");
+    expect(() => signatureToArgumentGuard(types, "number, number")).toThrow("Unexpected end of string");
   });
 });
 

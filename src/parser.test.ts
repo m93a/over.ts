@@ -34,29 +34,66 @@ describe("argument guard", () => {
   });
 
   it("superfluous args", () => {
-    const forbid = signatureToArgumentGuard(types, "number, string -> void", false);
+    const forbid = signatureToArgumentGuard(
+      types,
+      "number, string -> void",
+      false
+    );
     expect(forbid([4])).toBe(false);
-    expect(forbid([4, 'a'])).toBe(true);
-    expect(forbid([4, 'a', 'b'])).toBe(false);
-    
+    expect(forbid([4, "a"])).toBe(true);
+    expect(forbid([4, "a", "b"])).toBe(false);
 
-    const allow = signatureToArgumentGuard(types, "number, string -> void", true);
+    const allow = signatureToArgumentGuard(
+      types,
+      "number, string -> void",
+      true
+    );
     expect(allow([4])).toBe(false);
-    expect(allow([4, 'a'])).toBe(true);
-    expect(allow([4, 'a', 'b'])).toBe(true);
-    expect(allow([4, 'a', {}])).toBe(true);
+    expect(allow([4, "a"])).toBe(true);
+    expect(allow([4, "a", "b"])).toBe(true);
+    expect(allow([4, "a", {}])).toBe(true);
   });
 
   it("errors", () => {
-    expect(() => signatureToArgumentGuard(types, ", number -> void")).toThrow("Unexpected comma");
-    expect(() => signatureToArgumentGuard(types, "string,, number -> void")).toThrow("Duplicit comma");
-    expect(() => signatureToArgumentGuard(types, "string, -> void")).toThrow("Unexpected trailing comma");
-    expect(() => signatureToArgumentGuard(types, "%number -> void")).toThrow("Unexpected character");
-    expect(() => signatureToArgumentGuard(types, "number% -> void")).toThrow("Unexpected character");
-    expect(() => signatureToArgumentGuard(types, "number, % -> void")).toThrow("Unexpected character");
-    expect(() => signatureToArgumentGuard(types, "boolean -> void")).toThrow("Unknown type");
-    expect(() => signatureToArgumentGuard(types, "number number -> void")).toThrow("Unexpected identifier");
-    expect(() => signatureToArgumentGuard(types, "number, number")).toThrow("Unexpected end of string");
+    expect(() => signatureToArgumentGuard(types, ", number -> void")).toThrow(
+      "Unexpected comma"
+    );
+    expect(() =>
+      signatureToArgumentGuard(types, "string,, number -> void")
+    ).toThrow("Duplicit comma");
+    expect(() => signatureToArgumentGuard(types, "string, -> void")).toThrow(
+      "Unexpected trailing comma"
+    );
+    expect(() => signatureToArgumentGuard(types, "%number -> void")).toThrow(
+      "Unexpected character"
+    );
+    expect(() => signatureToArgumentGuard(types, "number% -> void")).toThrow(
+      "Unexpected character"
+    );
+    expect(() => signatureToArgumentGuard(types, "number, % -> void")).toThrow(
+      "Unexpected character"
+    );
+    expect(() => signatureToArgumentGuard(types, "boolean -> void")).toThrow(
+      "Unknown type"
+    );
+    expect(() =>
+      signatureToArgumentGuard(types, "number number -> void")
+    ).toThrow("Unexpected identifier");
+    expect(() => signatureToArgumentGuard(types, "number, number")).toThrow(
+      "Unexpected end of string"
+    );
+  });
+
+  it("whitespace resilient", () => {
+    const v = [3.1, "a", -2];
+    let g = signatureToArgumentGuard(types, "  number, string, number -> void");
+    expect(g(v)).toBe(true);
+
+    g = signatureToArgumentGuard(types, "number  , string,  number  ->  void");
+    expect(g(v)).toBe(true);
+
+    g = signatureToArgumentGuard(types, "number,string,number->void");
+    expect(g(v)).toBe(true);
   });
 });
 
@@ -68,8 +105,31 @@ describe("return guard", () => {
     expect(num({})).toBe(false);
 
     const boid = signatureToReturnGuard(types, "number -> void");
-    expect(boid('a')).toBe(false);
+    expect(boid("a")).toBe(false);
     expect(boid(undefined)).toBe(true);
     expect(boid(3)).toBe(false);
+  });
+
+  it("errors", () => {
+    expect(() => signatureToReturnGuard(types, "number")).toThrow(
+      "Unexpected end of string"
+    );
+    expect(() => signatureToReturnGuard(types, "number -> ")).toThrow(
+      "Unexpected end of string"
+    );
+    expect(() => signatureToReturnGuard(types, "number -> bool")).toThrow(
+      "Unknown type"
+    );
+  });
+
+  it("whitespace resilient", () => {
+    let g = signatureToReturnGuard(types, "string->number");
+    expect(g(42)).toBe(true);
+
+    g = signatureToReturnGuard(types, "number  ->   void");
+    expect(g(undefined)).toBe(true);
+
+    g = signatureToReturnGuard(types, "string -> string   ");
+    expect(g("a")).toBe(true);
   });
 });

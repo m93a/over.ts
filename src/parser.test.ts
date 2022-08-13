@@ -33,27 +33,6 @@ describe("argument guard", () => {
     expect(none([42])).toBe(false);
   });
 
-  it("superfluous args", () => {
-    const forbid = signatureToArgumentGuard(
-      types,
-      "number, string -> void",
-      false
-    );
-    expect(forbid([4])).toBe(false);
-    expect(forbid([4, "a"])).toBe(true);
-    expect(forbid([4, "a", "b"])).toBe(false);
-
-    const allow = signatureToArgumentGuard(
-      types,
-      "number, string -> void",
-      true
-    );
-    expect(allow([4])).toBe(false);
-    expect(allow([4, "a"])).toBe(true);
-    expect(allow([4, "a", "b"])).toBe(true);
-    expect(allow([4, "a", {}])).toBe(true);
-  });
-
   it("errors", () => {
     expect(() => signatureToArgumentGuard(types, ", number -> void")).toThrow(
       "Unexpected comma"

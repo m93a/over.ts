@@ -1,8 +1,7 @@
 import { signatureToArgumentGuard, signatureToReturnGuard } from "./parser";
 
 export interface Options {
-    checkResult?: boolean;
-    allowSuperfluousArguments: boolean;
+    checkResult: boolean;
 }
 
 export function useTypes<BaseTypes extends Record<string, unknown>>(
@@ -30,14 +29,14 @@ export function useTypes<BaseTypes extends Record<string, unknown>>(
         (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
 
 
-    const { checkResult, allowSuperfluousArguments } = options ?? {};
+    const { checkResult } = options ?? {};
 
     return function typed<T extends string>(
         implementations: { [L in T]: ResolveFunction<L> }
     ): UnionToIntersection<ResolveFunction<T>> {
 
         const signatures = Object.keys(implementations);
-        const argsGuards = signatures.map(s => signatureToArgumentGuard(typeGuards, s, allowSuperfluousArguments));
+        const argsGuards = signatures.map(s => signatureToArgumentGuard(typeGuards, s));
         let impls = signatures.map<(...a: any[]) => any>(s => implementations[s]);
 
         if (checkResult) {

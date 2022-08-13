@@ -39,24 +39,4 @@ describe("index", () => {
       "returned value did not match the expected type"
     );
   });
-
-  it("superfluous args", () => {
-    const typed = useTypes(types, { allowSuperfluousArguments: true });
-    const merge = typed({
-      "Set -> Set": (a) => a,
-      "Set, Set -> Set": (a, b) => new Set([...a, ...b]),
-      "Set, Set, Set -> Set": (a, b, c) => new Set([...a, ...b, ...c]),
-    });
-
-    expect(merge(new Set([1, 2, 3]))).toMatchObject(new Set([1, 2, 3]));
-    expect(merge(new Set([1, 2]), new Set([3]))).toMatchObject(
-      new Set([1, 2, 3])
-    );
-    expect(merge(new Set([1]), new Set([2]), new Set([3]))).toMatchObject(
-      new Set([1, 2, 3])
-    );
-    expect((merge as any)(new Set([1]), new Set([2]), new Set([3]), new Set([4]))).toMatchObject(
-      new Set([1, 2, 3])
-    );
-  });
 });

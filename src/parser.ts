@@ -5,8 +5,7 @@ const isArrow = (c1: string, c2: string) => c1 === "-" && c2 === ">";
 
 export function signatureToArgumentGuard(
   typeGuards: Record<string, (x: unknown) => boolean>,
-  signature: string,
-  acceptSuperfluousArguments: boolean = false
+  signature: string
 ): (args: unknown[]) => boolean {
   const guards: Array<(x: any) => boolean> = [];
 
@@ -82,10 +81,8 @@ export function signatureToArgumentGuard(
   if (state !== ParserState.Done)
     throw new SyntaxError(`Unexpected end of string, missing return type.`);
 
-  return acceptSuperfluousArguments
-    ? (args: unknown[]) => guards.every((g, i) => g(args[i]))
-    : (args: unknown[]) =>
-        args.length <= guards.length && guards.every((g, i) => g(args[i]));
+  return (args: unknown[]) =>
+    args.length <= guards.length && guards.every((g, i) => g(args[i]));
 }
 
 export function signatureToReturnGuard(

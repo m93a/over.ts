@@ -19,7 +19,7 @@ export const builtinTypes = {
   Map: (x: unknown): x is Map<any, any> => x instanceof Map,
   WeakMap: (x: unknown): x is WeakMap<any, any> => x instanceof WeakMap,
   Date: (x: unknown): x is Date => x instanceof Date,
-  Blobl: (x: unknown): x is Blob => x instanceof Blob,
+  Blob: (x: unknown): x is Blob => x instanceof Blob,
 
   Int8Array: (x: unknown): x is Int8Array => x instanceof Int8Array,
   Uint8Array: (x: unknown): x is Uint8Array => x instanceof Uint8Array,

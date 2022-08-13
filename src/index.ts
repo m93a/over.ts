@@ -9,7 +9,7 @@ export function useTypes<BaseTypes extends Record<string, unknown>>(
     typeGuards: {
         [K in keyof BaseTypes]: (x: unknown) => x is BaseTypes[K]
     },
-    options?: Options,
+    options?: Partial<Options>,
 ) {
     type K = string & keyof BaseTypes;
 

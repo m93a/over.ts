@@ -11,6 +11,8 @@ export const builtinTypes = {
   null: (x: unknown): x is null => x === null,
   nullish: (x: unknown): x is null | undefined => x === null || x === undefined,
   NaN: (x: unknown): x is number => Number.isNaN(x),
+  true: (x: unknown): x is true => x === true,
+  false: (x: unknown): x is false => x === false,
 
   Array: (x: unknown): x is any[] => Array.isArray(x),
   Set: (x: unknown): x is Set<any> => x instanceof Set,
